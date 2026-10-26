@@ -79,3 +79,10 @@ def test_omni_disable_log_stats_wins(monkeypatch: pytest.MonkeyPatch) -> None:
     _run_fixture(OmniServerParams(model="fake-model", use_omni=True, server_args=["--disable-log-stats"]))
     assert "--disable-log-stats" in captured
     assert "--log-stats" not in captured
+
+
+def test_omni_deploy_config_can_be_overridden_by_environment(monkeypatch: pytest.MonkeyPatch) -> None:
+    captured = _capture_server_args(monkeypatch)
+    monkeypatch.setenv("VLLM_OMNI_TEST_DEPLOY_CONFIG", "/tmp/oot-deploy.yaml")
+    _run_fixture(OmniServerParams(model="fake-model", use_omni=True))
+    assert captured[captured.index("--deploy-config") + 1] == "/tmp/oot-deploy.yaml"
